@@ -1,4 +1,4 @@
-﻿#include <stdio.h>
+#include <stdio.h>
 #include <mysql.h>
 #include <stdlib.h>
 #include <conio.h>
@@ -48,13 +48,13 @@ bool connect2Mysql(MYSQL mysql, char USER, char PASS, char DB_NAME)
 	return status;
 }
 
-void getWareHouseAccess(char DB_NAME,char USER,char PASS,char TABLE_NAME,char FILEN)
+void getWareHouseAccess(char *DB_NAME,char *USER,char *PASS,char *TABLE_NAME,char *FILENAME)
 {
-	strcpy(DB_NAME, getenv("wareHouseServer"));
-	strcpy(USER, getenv("USERNAME"));
-	strcpy(PASS, getenv("PASSWORD"));
-	strcpy(TABLE_NAME, getenv("wareHouseTable"));
-	strcpy(FILENAME, getenv("FILENAME"));
+	strcpy(DB_NAME, "wareHouse_Batch");
+	strcpy(USER, "user@whse_rcpt");
+	strcpy(PASS, "accessSpecify");
+	strcpy(TABLE_NAME, "wareHouseTable");
+	strcpy(FILENAME, "N01.Z4");
 }
 
 void updateDatatoDB(MYSQL mysql,FILE *myfile,Data d)
