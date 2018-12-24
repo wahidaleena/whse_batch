@@ -1,84 +1,81 @@
 #include <stdio.h>
 #include <mysql.h>
 #include <stdlib.h>
-#include <conio.h>
+#include <string.h>
 
 struct Data
 {
-    char i_num;	
-    char m_stat;
-    char s_loc;
+    char *i_num;
+    char *m_stat;
+    char *s_loc;
 };
 
+void getWareHouseAccess(char *DB_NAME, char *USER, char *PASS, char *TABLE_NAME, char *FILENAME)
+{
+    strcpy(DB_NAME, "wareHouse_Batch");
+    strcpy(USER, "user@whse_rcpt");
+    strcpy(PASS, "accessSpecify");
+    strcpy(TABLE_NAME, "wareHouseTable");
+    strcpy(FILENAME, "N01.Z4");
+}
+
+int connect2Mysql(MYSQL *mysql, char *DB_NAME, char *USER, char *PASS, char *TABLE_NAME)
+{
+    int status;
+    mysql = mysql_init(NULL);
+    status = mysql_real_connect(mysql, TABLE_NAME, USER, PASS, DB_NAME, 0, 0, 0);
+    return status;
+}
+
+void updateDatatoDB(MYSQL *mysql, FILE *myfile, struct Data *d, int i)
+{
+    int j = 0;
+    while (j<i)
+    {
+        char * i_num = d[j].i_num;
+        char * stat = d[j].m_stat;
+        mysql_query(mysql, "UPDATE DB_NAME SET movement_status = stat WHERE item_nbr = i_num");
+        fprintf(myfile, "UPDATE DB_NAME SET movement_status = %s WHERE item_nbr = %s", stat, i_num);
+        j++;
+    }
+}
+
+int readDataFromFile(FILE *myfile, struct Data *d)
+{
+    int i=0;
+    size_t s;
+    while (myfile)
+    {
+        getline(&(d[i].i_num), &s, myfile);
+        getline(&(d[i].m_stat), &s, myfile);
+        getline(&(d[i++].s_loc), &s, myfile);
+    }
+
+    return i;
+}
+
 int main () {
-  
-	FILE *fp;
-	struct Data d[100];
-	char DB_NAME[1000],USER[1000],PASS[1000],TABLE_NAME[1000],FILEN[1000];
-	bool status;
 
-   getWareHouseAccess(DB_NAME,USER,PASS,TABLE_NAME,FILEN);
+    FILE *fp;
+    struct Data d[100];
+    char DB_NAME[1000], USER[1000], PASS[1000], TABLE_NAME[1000], FILENAME[1000];
+    int status;
 
-	myfile=fopen("wareHouseContent.csv", "w");
+    getWareHouseAccess(DB_NAME, USER, PASS, TABLE_NAME, FILENAME);
 
+    fp = fopen(FILENAME, "w");
 
-	MYSQL mysql;
-	status = connect2Mysql(mysql,USER, PASS, DB_NAME);
-	
-	if(status== True)
-	{
-		updateDatatoDB(mysql,d);
-		fprintf(fp, "UPDATE TABLE_NAME SET movement_status = %s WHERE item_nbr = %s", stat,i_num);
-	}
-	else
-	{
-		updateDatatoFile(fp,d);
-	}	
+    int i = readDataFromFile(fp, d);
 
+    MYSQL mysql;
+    status = connect2Mysql(mysql, USER, PASS, DB_NAME);
 
-	fclose(fp);
-	return 0;
+    if(status)
+    {
+        updateDatatoDB(mysql, d, i);
+    }
+
+    fclose(fp);
+    return 0;
 }
 
-bool connect2Mysql(MYSQL mysql, char USER, char PASS, char DB_NAME)
-{
-	bool status;
-	mysql = mysql_init(NULL);
-	mysql_real_connect(mysql, "WareHouseItem_Server", USER, PASS, DB_NAME, 0, 0, 0);
-	return status;
-}
-
-void getWareHouseAccess(char *DB_NAME,char *USER,char *PASS,char *TABLE_NAME,char *FILENAME)
-{
-	strcpy(DB_NAME, "wareHouse_Batch");
-	strcpy(USER, "user@whse_rcpt");
-	strcpy(PASS, "accessSpecify");
-	strcpy(TABLE_NAME, "wareHouseTable");
-	strcpy(FILENAME, "N01.Z4");
-}
-
-void updateDatatoDB(MYSQL mysql,FILE *myfile,Data d)
-{
-	int j = 0;
-	while (j<i)
-	{
-		string i_num = d[j].i_num;
-		string stat = d[j].m_stat;
-		mysql_query(mysql, "UPDATE TABLE_NAME SET movement_status = stat WHERE item_nbr = i_num");
-		j++;
-	}
-	updateDatatoFile(myfile,d);
-	
-}
-
-void updateDatatoFile(FILE *myfile,Data d)
-{
-	int i=0;
-	
-	while (myfile)
-	{
-		getline(myfile, d[i].i_num, ',');
-		getline(myfile, d[i].m_stat, ',');
-		getline(myfile, d[i++].s_loc, '\n');
-	}
-}
