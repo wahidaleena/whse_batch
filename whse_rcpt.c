@@ -3,6 +3,14 @@
 #include <stdlib.h>
 #include <string.h>
 
+/*
+typedef int MYSQL;
+extern MYSQL *mysql_init(MYSQL *mysql);
+extern MYSQL *mysql_real_connect(MYSQL *mysql, const char *host, const char *user, const char *passwd, const char *db, unsigned int port, const char *unix_socket, unsigned long client_flag);
+extern unsigned int mysql_errno(MYSQL *mysql);
+extern int mysql_query(MYSQL *mysql, const char *stmt_str);
+//*/
+
 struct Data
 {
     char *i_num;
@@ -19,12 +27,11 @@ void getWareHouseAccess(char *DB_NAME, char *USER, char *PASS, char *TABLE_NAME,
     strcpy(FILENAME, "N01.Z4");
 }
 
-int connect2Mysql(MYSQL *mysql, char *DB_NAME, char *USER, char *PASS, char *TABLE_NAME)
+int connect2Mysql(MYSQL **mysql, char *DB_NAME, char *USER, char *PASS, char *TABLE_NAME)
 {
-    int status;
-    mysql = mysql_init(NULL);
-    status = mysql_real_connect(mysql, TABLE_NAME, USER, PASS, DB_NAME, 0, 0, 0);
-    return status;
+    *mysql = mysql_init(NULL);
+    mysql_real_connect(*mysql, TABLE_NAME, USER, PASS, DB_NAME, 0, 0, 0);
+    return mysql_errno(*mysql);
 }
 
 void updateDatatoDB(MYSQL *mysql, FILE *myfile, struct Data *d, int i)
@@ -67,15 +74,14 @@ int main () {
 
     int i = readDataFromFile(fp, d);
 
-    MYSQL mysql;
-    status = connect2Mysql(mysql, USER, PASS, DB_NAME);
+    MYSQL *mysql;
+    status = connect2Mysql(&mysql, USER, PASS, DB_NAME, TABLE_NAME);
 
     if(status)
     {
-        updateDatatoDB(mysql, d, i);
+        updateDatatoDB(mysql, fp, d, i);
     }
 
     fclose(fp);
     return 0;
 }
-
