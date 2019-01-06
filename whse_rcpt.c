@@ -41,8 +41,8 @@ void updateDatatoDB(MYSQL *mysql, FILE *myfile, struct Data *d, int i)
     {
         char * i_num = d[j].i_num;
         char * stat = d[j].m_stat;
-        mysql_query(mysql, "UPDATE DB_NAME SET movement_status = stat WHERE item_nbr = i_num");
-        fprintf(myfile, "UPDATE DB_NAME SET movement_status = %s WHERE item_nbr = %s", stat, i_num);
+        mysql_query(mysql, "UPDATE wareHouse_Batch  SET movement_status = stat WHERE item_nbr = i_num");
+        fprintf(myfile, "UPDATE wareHouse_Batch  SET movement_status = %s WHERE item_nbr = %s", stat, i_num);
         j++;
     }
 }
