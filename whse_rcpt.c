@@ -18,19 +18,20 @@ struct Data
     char *s_loc;
 };
 
-void getWareHouseAccess(char *DB_NAME, char *USER, char *PASS, char *TABLE_NAME, char *FILENAME)
+void getWareHouseAccess(char *DB_NAME,char *HOST, char *USER, char *PASS, char *TABLE_NAME, char *FILENAME)
 {
     strcpy(DB_NAME, "wareHouse_Batch");
-    strcpy(USER, "user@whse_rcpt");
+    strcpy(HOST, "whse_rcpt");
+    strcpy(USER, "user");
     strcpy(PASS, "accessSpecify");
     strcpy(TABLE_NAME, "wareHouseTable");
     strcpy(FILENAME, "N01.Z4");
 }
 
-int connect2Mysql(MYSQL **mysql, char *DB_NAME, char *USER, char *PASS, char *TABLE_NAME)
+int connect2Mysql(MYSQL **mysql, char *HOST, char *DB_NAME, char *USER, char *PASS, char *TABLE_NAME)
 {
     *mysql = mysql_init(NULL);
-    mysql_real_connect(*mysql, TABLE_NAME, USER, PASS, DB_NAME, 0, 0, 0);
+    mysql_real_connect(*mysql, HOST, USER, PASS, DB_NAME, 0, 0, 0);
     return mysql_errno(*mysql);
 }
 
@@ -41,8 +42,8 @@ void updateDatatoDB(MYSQL *mysql, FILE *myfile, struct Data *d, int i)
     {
         char * i_num = d[j].i_num;
         char * stat = d[j].m_stat;
-        mysql_query(mysql, "UPDATE wareHouse_Batch  SET movement_status = stat WHERE item_nbr = i_num");
-        fprintf(myfile, "UPDATE wareHouse_Batch  SET movement_status = %s WHERE item_nbr = %s", stat, i_num);
+        mysql_query(mysql, "UPDATE wareHouseTable  SET movement_status = stat WHERE item_nbr = i_num");
+        fprintf(myfile, "UPDATE wareHouseTable  SET movement_status = %s WHERE item_nbr = %s", stat, i_num);
         j++;
     }
 }
@@ -68,14 +69,14 @@ int main () {
     char DB_NAME[1000], USER[1000], PASS[1000], TABLE_NAME[1000], FILENAME[1000];
     int status;
 
-    getWareHouseAccess(DB_NAME, USER, PASS, TABLE_NAME, FILENAME);
+    getWareHouseAccess(DB_NAME, HOST, USER, PASS, TABLE_NAME, FILENAME);
 
     fp = fopen(FILENAME, "w");
 
     int i = readDataFromFile(fp, d);
 
     MYSQL *mysql;
-    status = connect2Mysql(&mysql, USER, PASS, DB_NAME, TABLE_NAME);
+    status = connect2Mysql(&mysql, HOST, USER, PASS, DB_NAME, TABLE_NAME);
 
     if(status)
     {
