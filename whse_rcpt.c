@@ -20,15 +20,15 @@ struct Data
 
 void getWareHouseAccess(char *DB_NAME,char *HOST, char *USER, char *PASS, char *TABLE_NAME, char *FILENAME)
 {
-    strcpy(DB_NAME, "wareHouse_Batch");
-    strcpy(HOST, "whse_rcpt");
+    strcpy(DB_NAME, "warehouse_receipts");
+    strcpy(HOST, "WHSE_01");
     strcpy(USER, "user");
     strcpy(PASS, "accessSpecify");
-    strcpy(TABLE_NAME, "wareHouseTable");
+    strcpy(TABLE_NAME, "Received_Items");
     strcpy(FILENAME, "N01.Z4");
 }
 
-int connect2Mysql(MYSQL **mysql, char *HOST, char *DB_NAME, char *USER, char *PASS, char *TABLE_NAME)
+int connect2Mysql(MYSQL **mysql, char *HOST, char *USER, char *PASS, char *DB_NAME, char *TABLE_NAME)
 {
     *mysql = mysql_init(NULL);
     mysql_real_connect(*mysql, HOST, USER, PASS, DB_NAME, 0, 0, 0);
@@ -42,8 +42,8 @@ void updateDatatoDB(MYSQL *mysql, FILE *myfile, struct Data *d, int i)
     {
         char * i_num = d[j].i_num;
         char * stat = d[j].m_stat;
-        mysql_query(mysql, "UPDATE wareHouseTable  SET movement_status = stat WHERE item_nbr = i_num");
-        fprintf(myfile, "UPDATE wareHouseTable  SET movement_status = %s WHERE item_nbr = %s", stat, i_num);
+        mysql_query(mysql, "UPDATE Received_Items  SET movement_status = stat WHERE item_nbr = i_num");
+        fprintf(myfile, "UPDATE Received_Items  SET movement_status = %s WHERE item_nbr = %s", stat, i_num);
         j++;
     }
 }
